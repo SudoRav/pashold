@@ -8,8 +8,27 @@ namespace pashold.Models
 {
     public class PasswordItem : INotifyPropertyChanged
     {
-        public string EncryptedName { get; set; }
-        public string EncryptedContent { get; set; }
+        private string _encryptedName;
+        public string EncryptedName
+        {
+            get => _encryptedName;
+            set
+            {
+                _encryptedName = value;
+                _name = null;
+            }
+        }
+
+        private string _encryptedContent;
+        public string EncryptedContent
+        {
+            get => _encryptedContent;
+            set
+            {
+                _encryptedContent = value;
+                _content = null;
+            }
+        }
 
         private string _name;
         private string _content;
@@ -58,8 +77,8 @@ namespace pashold.Models
 
         public PasswordItem(string name, string content)
         {
-            _name = name;
-            _content = content;
+            Name = name;
+            Content = content;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

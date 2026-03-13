@@ -9,8 +9,27 @@ namespace pashold.Models
 {
     public class Block : INotifyPropertyChanged
     {
-        public string EncryptedName { get; set; }
-        public string EncryptedDescription { get; set; }
+        private string _encryptedName;
+        public string EncryptedName
+        {
+            get => _encryptedName;
+            set
+            {
+                _encryptedName = value;
+                _name = null;
+            }
+        }
+
+        private string _encryptedDescription;
+        public string EncryptedDescription
+        {
+            get => _encryptedDescription;
+            set
+            {
+                _encryptedDescription = value;
+                _description = null;
+            }
+        }
 
         public ObservableCollection<PasswordItem> PasswordItems { get; set; } = new();
 
@@ -67,6 +86,7 @@ namespace pashold.Models
             Name = name;
             Description = description;
         }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string prop = null)

@@ -217,7 +217,7 @@ namespace pashold.ViewModels
         #region Блоки и пароли
         private void AddBlock()
         {
-            var block = new Block("Новый блок", "Описание Блока");
+            var block = new Block("", "");
 
             block.PropertyChanged += Block_PropertyChanged;
             block.PasswordItems.CollectionChanged += PasswordItems_CollectionChanged;

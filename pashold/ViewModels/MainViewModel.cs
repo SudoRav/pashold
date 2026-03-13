@@ -43,6 +43,23 @@ namespace pashold.ViewModels
                     if (keyWindow.ShowDialog() == true)
                     {
                         EncryptionKey = keyWindow.Key;
+
+                        // Проверим, можем ли расшифровать хотя бы один блок
+                        bool validKey = true;
+                        foreach (var block in _selectedJsonFile.Blocks)
+                        {
+                            if (CryptoService.SafeDecrypt(block.EncryptedName, EncryptionKey) == null)
+                            {
+                                validKey = false;
+                                break;
+                            }
+                        }
+
+                        if (!validKey)
+                        {
+                            SelectedJsonFile = null;
+                            return;
+                        }
                     }
                     else
                     {
@@ -160,7 +177,7 @@ namespace pashold.ViewModels
                 File.WriteAllText(pf.FilePath, json);
 
                 RefreshJsonFiles();
-                SelectedJsonFile = pf;
+                //SelectedJsonFile = pf;
             }
         }
         #endregion
@@ -168,11 +185,7 @@ namespace pashold.ViewModels
         #region Блоки и пароли
         private void AddBlock()
         {
-            var block = new Block
-            {
-                Name = "Новый блок",
-                Description = "Описание"
-            };
+            var block = new Block("", "");
             Blocks.Add(block);
             block.PasswordItems.CollectionChanged += PasswordItems_CollectionChanged;
             SaveCurrentJson();
@@ -194,7 +207,8 @@ namespace pashold.ViewModels
             var window = new AddPasswordWindow { Owner = Application.Current.MainWindow };
             if (window.ShowDialog() == true && window.Password != null)
             {
-                block.PasswordItems.Add(window.Password);
+                var password = new PasswordItem(window.Password.Name, window.Password.Content);
+                block.PasswordItems.Add(password);
                 SaveCurrentJson();
             }
         }

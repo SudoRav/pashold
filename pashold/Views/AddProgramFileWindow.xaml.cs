@@ -30,7 +30,6 @@ namespace pashold
             ProgramFile = new ProgramFile
             {
                 OriginalName = tbName.Text,
-                EncryptedName = tbName.Text
             };
 
             Key = tbKey.Password;

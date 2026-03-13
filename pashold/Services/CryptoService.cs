@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -15,13 +14,15 @@ namespace pashold.Services
 
         public static string Encrypt(string text, string password)
         {
-            if (string.IsNullOrEmpty(text)) return "";
+            if (string.IsNullOrEmpty(text))
+                return "";
 
             using var aes = Aes.Create();
             aes.Key = GetKey(password);
             aes.GenerateIV();
 
             using var encryptor = aes.CreateEncryptor();
+
             byte[] plain = Encoding.UTF8.GetBytes(text);
             byte[] encrypted = encryptor.TransformFinalBlock(plain, 0, plain.Length);
 
@@ -34,23 +35,53 @@ namespace pashold.Services
 
         public static string Decrypt(string encryptedText, string password)
         {
-            if (string.IsNullOrEmpty(encryptedText)) return "";
+            if (string.IsNullOrEmpty(encryptedText))
+                return "";
 
-            byte[] data = Convert.FromBase64String(encryptedText);
+            try
+            {
+                byte[] data = Convert.FromBase64String(encryptedText);
 
-            using var aes = Aes.Create();
-            aes.Key = GetKey(password);
+                using var aes = Aes.Create();
+                aes.Key = GetKey(password);
 
-            byte[] iv = new byte[16];
-            byte[] cipher = new byte[data.Length - 16];
-            Buffer.BlockCopy(data, 0, iv, 0, 16);
-            Buffer.BlockCopy(data, 16, cipher, 0, cipher.Length);
-            aes.IV = iv;
+                byte[] iv = new byte[16];
+                byte[] cipher = new byte[data.Length - 16];
 
-            using var decryptor = aes.CreateDecryptor();
-            byte[] decrypted = decryptor.TransformFinalBlock(cipher, 0, cipher.Length);
+                Buffer.BlockCopy(data, 0, iv, 0, 16);
+                Buffer.BlockCopy(data, 16, cipher, 0, cipher.Length);
 
-            return Encoding.UTF8.GetString(decrypted);
+                aes.IV = iv;
+
+                using var decryptor = aes.CreateDecryptor();
+
+                byte[] decrypted = decryptor.TransformFinalBlock(cipher, 0, cipher.Length);
+
+                return Encoding.UTF8.GetString(decrypted);
+            }
+            catch (CryptographicException)
+            {
+                // Выбрасываем сообщение о неправильном ключе
+                System.Windows.MessageBox.Show(
+                    "Неверный ключ шифрования! Дешифровка невозможна.",
+                    "Ошибка",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error
+                );
+                return null; // или ""
+            }
+        }
+        public static string SafeDecrypt(string encryptedText, string password)
+        {
+            try
+            {
+                return Decrypt(encryptedText, password);
+            }
+            catch
+            {
+                // если ключ неверный или данные повреждены — возвращаем null
+                return null;
+            }
         }
     }
 }

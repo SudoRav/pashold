@@ -1,12 +1,65 @@
 ﻿<Window x:Class="pashold.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:pashold"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        xmlns:local="clr-namespace:pashold.ViewModels"
+        Title="Менеджер Pashold" Height="500" Width="800">
+    <Window.DataContext>
+        <local:MainViewModel/>
+    </Window.DataContext>
+
+    <DockPanel>
+        <!-- Левая панель -->
+        <StackPanel DockPanel.Dock="Left" Width="250" Margin="5">
+            <TextBlock Text="JSON файлы:" FontWeight="Bold" Margin="0,0,0,5"/>
+            <ListBox ItemsSource="{Binding JsonFiles}" SelectedItem="{Binding SelectedJsonFile}" DisplayMemberPath="OriginalName" Height="300"/>
+            <Button Content="Обзор" Command="{Binding BrowseFolderCommand}" Margin="0,5,0,0"/>
+            <Button Content="+ Создать" Command="{Binding CreateProgramFileCommand}" Margin="0,5,0,0"/>
+        </StackPanel>
+
+        <!-- Правая панель -->
+        <ScrollViewer>
+            <StackPanel Margin="10">
+                <Button Content="Добавить блок" Width="120" Margin="0,0,0,10"
+                        Command="{Binding AddBlockCommand}" />
+
+                <ItemsControl ItemsSource="{Binding Blocks}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="Gray" BorderThickness="1" Margin="2" Padding="5">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Width="200"/>
+                                        <TextBlock Text="{Binding Description}" Width="200" Margin="5,0,0,0"/>
+                                        <Button Content="Удалить блок" Width="120"
+                                                Command="{Binding DataContext.DeleteBlockCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}" Margin="5,0,0,0"/>
+                                        <Button Content="Добавить пароль" Width="120"
+                                                Command="{Binding DataContext.AddPasswordCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}" Margin="5,0,0,0"/>
+                                    </StackPanel>
+
+                                    <ItemsControl ItemsSource="{Binding PasswordItems}" Margin="20,5,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Name}" Width="150"/>
+                                                    <TextBlock Text="{Binding Content}" Width="150"/>
+                                                    <Button Content="Удалить" Width="80"
+                                                            Command="{Binding DataContext.DeletePasswordCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                            CommandParameter="{Binding}" Margin="5,0,0,0"/>
+                                                    <Button Content="Копировать" Width="80"
+                                                            Command="{Binding DataContext.CopyPasswordCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                            CommandParameter="{Binding}" Margin="5,0,0,0"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
 </Window>

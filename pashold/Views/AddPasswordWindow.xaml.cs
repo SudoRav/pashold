@@ -13,6 +13,9 @@ namespace pashold
         public AddPasswordWindow()
         {
             InitializeComponent();
+
+            NameTextBox.Text = $"Новый пароль {DateTime.Now.ToString("dd.MM.yyyy")}";
+            ContentTextBox.Text = GenPas();
         }
 
         private void Add_Click(object sender, RoutedEventArgs e)
@@ -39,6 +42,11 @@ namespace pashold
 
         private void Generate_Click(object sender, RoutedEventArgs e)
         {
+            ContentTextBox.Text = GenPas();
+        }
+
+        private string GenPas()
+        {
             const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()-_=+[]{}<>?/|";
 
             int lengthgen = int.Parse(LenghtTextBox.Text);
@@ -56,7 +64,7 @@ namespace pashold
                 }
             }
 
-            ContentTextBox.Text = password.ToString();
+            return password.ToString();
         }
     }
 }

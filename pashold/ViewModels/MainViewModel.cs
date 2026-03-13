@@ -4,6 +4,7 @@ using pashold.Services;
 using pashold.Views;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Text.Json;
@@ -14,6 +15,8 @@ namespace pashold.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
+        // Статическая ссылка для автосохранения из моделей
+        private static MainViewModel _instance;
         public static string EncryptionKey { get; set; }
 
         private readonly Dictionary<string, string> _fileKeys = new Dictionary<string, string>();
@@ -28,7 +31,7 @@ namespace pashold.ViewModels
                 if (_selectedJsonFile == value)
                     return;
 
-                // отписка старых событий
+                // Отписка от старых событий
                 if (_selectedJsonFile != null && _selectedJsonFile.Blocks != null)
                 {
                     foreach (var block in _selectedJsonFile.Blocks)
@@ -45,21 +48,17 @@ namespace pashold.ViewModels
 
                 string filePath = _selectedJsonFile.FilePath;
 
-                // 1. Проверяем есть ли ключ в кеше
+                // Получение ключа
                 if (_fileKeys.ContainsKey(filePath))
                 {
                     EncryptionKey = _fileKeys[filePath];
                 }
                 else
                 {
-                    // 2. Если нет — спрашиваем пользователя
                     var keyWindow = new AskKeyWindow { Owner = Application.Current.MainWindow };
-
                     if (keyWindow.ShowDialog() == true)
                     {
                         EncryptionKey = keyWindow.Key;
-
-                        // сохраняем ключ в кеш
                         _fileKeys[filePath] = EncryptionKey;
                     }
                     else
@@ -76,7 +75,13 @@ namespace pashold.ViewModels
                 Blocks = _selectedJsonFile.Blocks;
 
                 foreach (var block in Blocks)
+                {
+                    block.PropertyChanged += Block_PropertyChanged;
                     block.PasswordItems.CollectionChanged += PasswordItems_CollectionChanged;
+
+                    foreach (var pass in block.PasswordItems)
+                        pass.PropertyChanged += Password_PropertyChanged;
+                }
 
                 Blocks.CollectionChanged += Blocks_CollectionChanged;
 
@@ -96,8 +101,11 @@ namespace pashold.ViewModels
         public ICommand DeletePasswordCommand { get; }
         public ICommand CopyPasswordCommand { get; }
 
+        // Конструктор
         public MainViewModel()
         {
+            _instance = this;
+
             BrowseFolderCommand = new RelayCommand<object>(_ => BrowseFolder());
             CreateProgramFileCommand = new RelayCommand<object>(_ => CreateProgramFile());
             AddBlockCommand = new RelayCommand<object>(_ => AddBlock());
@@ -106,12 +114,35 @@ namespace pashold.ViewModels
             DeletePasswordCommand = new RelayCommand<PasswordItem>(DeletePassword);
             CopyPasswordCommand = new RelayCommand<PasswordItem>(CopyPassword);
 
-            // автозагрузка последнего пути
+            // Автозагрузка последнего пути
             if (!string.IsNullOrEmpty(Properties.Settings.Default.LastJsonFolder) && Directory.Exists(Properties.Settings.Default.LastJsonFolder))
             {
                 JsonFolderPath = Properties.Settings.Default.LastJsonFolder;
                 RefreshJsonFiles();
             }
+
+            foreach (var block in Blocks)
+            {
+                block.PropertyChanged += Block_PropertyChanged;
+                block.PasswordItems.CollectionChanged += PasswordItems_CollectionChanged;
+
+                foreach (var pass in block.PasswordItems)
+                    pass.PropertyChanged += Password_PropertyChanged;
+            }
+        }
+
+        public static void SaveCurrentJsonStatic() => _instance?.SaveCurrentJson();
+
+        private void Block_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Name" || e.PropertyName == "Description")
+                SaveCurrentJson();
+        }
+
+        private void Password_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Name" || e.PropertyName == "Content")
+                SaveCurrentJson();
         }
 
         #region JSON Файлы
@@ -178,7 +209,6 @@ namespace pashold.ViewModels
                 File.WriteAllText(pf.FilePath, json);
 
                 RefreshJsonFiles();
-                //SelectedJsonFile = pf;
                 EncryptionKey = null;
             }
         }
@@ -187,9 +217,12 @@ namespace pashold.ViewModels
         #region Блоки и пароли
         private void AddBlock()
         {
-            var block = new Block("", "");
-            Blocks.Add(block);
+            var block = new Block("Новый блок", "Описание Блока");
+
+            block.PropertyChanged += Block_PropertyChanged;
             block.PasswordItems.CollectionChanged += PasswordItems_CollectionChanged;
+
+            Blocks.Add(block);
             SaveCurrentJson();
         }
 
@@ -207,9 +240,12 @@ namespace pashold.ViewModels
             if (block == null) return;
 
             var window = new AddPasswordWindow { Owner = Application.Current.MainWindow };
-            if (window.ShowDialog() == true && window.Password != null)
+
+            if (window.ShowDialog() == true)
             {
                 var password = new PasswordItem(window.Password.Name, window.Password.Content);
+                password.PropertyChanged += Password_PropertyChanged;
+
                 block.PasswordItems.Add(password);
                 SaveCurrentJson();
             }
@@ -233,16 +269,19 @@ namespace pashold.ViewModels
         {
             if (password != null)
             {
-                Clipboard.SetText(password.Content); // автоматически расшифровывает
+                Clipboard.SetText(password.Content);
                 MessageBox.Show($"Пароль '{password.Name}' скопирован в буфер обмена!", "Скопировано");
             }
         }
 
-        private void Blocks_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void Blocks_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)
                 foreach (Block block in e.NewItems)
+                {
+                    block.PropertyChanged += Block_PropertyChanged;
                     block.PasswordItems.CollectionChanged += PasswordItems_CollectionChanged;
+                }
 
             if (e.OldItems != null)
                 foreach (Block block in e.OldItems)
@@ -251,8 +290,14 @@ namespace pashold.ViewModels
             SaveCurrentJson();
         }
 
-        private void PasswordItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void PasswordItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            if (e.NewItems != null)
+            {
+                foreach (PasswordItem item in e.NewItems)
+                    item.PropertyChanged += Password_PropertyChanged;
+            }
+
             SaveCurrentJson();
         }
 

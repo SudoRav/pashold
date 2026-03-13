@@ -1,30 +1,62 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using System.Windows;
 using pashold.Services;
 using pashold.ViewModels;
 
 namespace pashold.Models
 {
-    public class Block
+    public class Block : INotifyPropertyChanged
     {
         public string EncryptedName { get; set; }
         public string EncryptedDescription { get; set; }
 
-        public ObservableCollection<PasswordItem> PasswordItems { get; set; } = new ObservableCollection<PasswordItem>();
+        public ObservableCollection<PasswordItem> PasswordItems { get; set; } = new();
+
+        private string _name;
+        private string _description;
 
         [JsonIgnore]
         public string Name
         {
-            get => CryptoService.SafeDecrypt(EncryptedName, MainViewModel.EncryptionKey) ?? "[Неверный ключ]";
-            set => EncryptedName = CryptoService.Encrypt(value, MainViewModel.EncryptionKey);
+            get
+            {
+                if (_name == null && EncryptedName != null)
+                    _name = CryptoService.SafeDecrypt(EncryptedName, MainViewModel.EncryptionKey);
+                return _name;
+            }
+            set
+            {
+                _name = value;
+
+                if (!string.IsNullOrEmpty(MainViewModel.EncryptionKey))
+                    EncryptedName = CryptoService.Encrypt(value, MainViewModel.EncryptionKey);
+
+                OnPropertyChanged();
+                MainViewModel.SaveCurrentJsonStatic(); // сразу сохраняем файл
+            }
         }
 
         [JsonIgnore]
         public string Description
         {
-            get => CryptoService.SafeDecrypt(EncryptedDescription, MainViewModel.EncryptionKey) ?? "[Неверный ключ]";
-            set => EncryptedDescription = CryptoService.Encrypt(value, MainViewModel.EncryptionKey);
+            get
+            {
+                if (_description == null && EncryptedDescription != null)
+                    _description = CryptoService.SafeDecrypt(EncryptedDescription, MainViewModel.EncryptionKey);
+                return _description;
+            }
+            set
+            {
+                _description = value;
+
+                if (!string.IsNullOrEmpty(MainViewModel.EncryptionKey))
+                    EncryptedDescription = CryptoService.Encrypt(value, MainViewModel.EncryptionKey);
+
+                OnPropertyChanged();
+                MainViewModel.SaveCurrentJsonStatic(); // сразу сохраняем файл
+            }
         }
 
         public Block(string name, string description)
@@ -36,6 +68,10 @@ namespace pashold.Models
             Description = description;
         }
 
-        public Block() { }
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string prop = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+        }
     }
 }

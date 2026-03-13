@@ -6,10 +6,15 @@ namespace pashold.Services
 {
     public static class CryptoService
     {
-        private static byte[] GetKey(string password)
+        public static byte[] GetKey(string password)
         {
-            using var sha = SHA256.Create();
-            return sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+            if (string.IsNullOrEmpty(password))
+                return null;
+
+            using (var sha = SHA256.Create())
+            {
+                return sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+            }
         }
 
         public static string Encrypt(string text, string password)
@@ -73,13 +78,15 @@ namespace pashold.Services
         }
         public static string SafeDecrypt(string encryptedText, string password)
         {
+            if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(encryptedText))
+                return null;
+
             try
             {
                 return Decrypt(encryptedText, password);
             }
             catch
             {
-                // если ключ неверный или данные повреждены — возвращаем null
                 return null;
             }
         }

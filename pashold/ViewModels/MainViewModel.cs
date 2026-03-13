@@ -1,20 +1,22 @@
-﻿using System.Collections.ObjectModel;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using pashold.Models;
+using pashold.Services;
+using pashold.Views;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using pashold.Models;
-using pashold.Services;
-using pashold.Views;
 
 namespace pashold.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        public static string EncryptionKey { get; set; } = "default"; // для теста, можно заменить на ключ пользователя
+        public static string EncryptionKey { get; set; }
 
+        private readonly Dictionary<string, string> _fileKeys = new Dictionary<string, string>();
         public ObservableCollection<ProgramFile> JsonFiles { get; set; } = new ObservableCollection<ProgramFile>();
 
         private ProgramFile _selectedJsonFile;
@@ -23,61 +25,60 @@ namespace pashold.ViewModels
             get => _selectedJsonFile;
             set
             {
-                if (_selectedJsonFile == value) return;
+                if (_selectedJsonFile == value)
+                    return;
 
-                // отписка старой коллекции
+                // отписка старых событий
                 if (_selectedJsonFile != null && _selectedJsonFile.Blocks != null)
                 {
                     foreach (var block in _selectedJsonFile.Blocks)
                         block.PasswordItems.CollectionChanged -= PasswordItems_CollectionChanged;
+
                     _selectedJsonFile.Blocks.CollectionChanged -= Blocks_CollectionChanged;
                 }
 
                 _selectedJsonFile = value;
                 OnPropertyChanged(nameof(SelectedJsonFile));
 
-                if (_selectedJsonFile != null)
+                if (_selectedJsonFile == null)
+                    return;
+
+                string filePath = _selectedJsonFile.FilePath;
+
+                // 1. Проверяем есть ли ключ в кеше
+                if (_fileKeys.ContainsKey(filePath))
                 {
-                    // Запрос ключа
+                    EncryptionKey = _fileKeys[filePath];
+                }
+                else
+                {
+                    // 2. Если нет — спрашиваем пользователя
                     var keyWindow = new AskKeyWindow { Owner = Application.Current.MainWindow };
+
                     if (keyWindow.ShowDialog() == true)
                     {
                         EncryptionKey = keyWindow.Key;
 
-                        // Проверим, можем ли расшифровать хотя бы один блок
-                        bool validKey = true;
-                        foreach (var block in _selectedJsonFile.Blocks)
-                        {
-                            if (CryptoService.SafeDecrypt(block.EncryptedName, EncryptionKey) == null)
-                            {
-                                validKey = false;
-                                break;
-                            }
-                        }
-
-                        if (!validKey)
-                        {
-                            SelectedJsonFile = null;
-                            return;
-                        }
+                        // сохраняем ключ в кеш
+                        _fileKeys[filePath] = EncryptionKey;
                     }
                     else
                     {
-                        SelectedJsonFile = null;
+                        _selectedJsonFile = null;
+                        OnPropertyChanged(nameof(SelectedJsonFile));
                         return;
                     }
-
-                    // теперь Blocks будут дешифроваться корректно
-                    if (_selectedJsonFile.Blocks == null)
-                        _selectedJsonFile.Blocks = new ObservableCollection<Block>();
-
-                    Blocks = _selectedJsonFile.Blocks;
-
-                    foreach (var block in Blocks)
-                        block.PasswordItems.CollectionChanged += PasswordItems_CollectionChanged;
-
-                    Blocks.CollectionChanged += Blocks_CollectionChanged;
                 }
+
+                if (_selectedJsonFile.Blocks == null)
+                    _selectedJsonFile.Blocks = new ObservableCollection<Block>();
+
+                Blocks = _selectedJsonFile.Blocks;
+
+                foreach (var block in Blocks)
+                    block.PasswordItems.CollectionChanged += PasswordItems_CollectionChanged;
+
+                Blocks.CollectionChanged += Blocks_CollectionChanged;
 
                 OnPropertyChanged(nameof(Blocks));
             }
@@ -178,6 +179,7 @@ namespace pashold.ViewModels
 
                 RefreshJsonFiles();
                 //SelectedJsonFile = pf;
+                EncryptionKey = null;
             }
         }
         #endregion

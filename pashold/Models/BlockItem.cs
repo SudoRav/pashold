@@ -29,8 +29,8 @@ namespace pashold.Models
 
         public Block(string name, string description)
         {
-            if (!string.IsNullOrEmpty(name)) name = "Название Блока";
-            if (!string.IsNullOrEmpty(description)) description = "Описание Блока";
+            if (string.IsNullOrEmpty(name)) name = "Название Блока";
+            if (string.IsNullOrEmpty(description)) description = "Описание Блока";
 
             Name = name;
             Description = description;

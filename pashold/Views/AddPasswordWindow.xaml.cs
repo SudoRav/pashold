@@ -1,5 +1,8 @@
-﻿using System.Windows;
-using pashold.Models;
+﻿using pashold.Models;
+using System;
+using System.Security.Cryptography;
+using System.Text;
+using System.Windows;
 
 namespace pashold
 {
@@ -32,6 +35,28 @@ namespace pashold
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false; // просто закрываем окно
+        }
+
+        private void Generate_Click(object sender, RoutedEventArgs e)
+        {
+            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()-_=+[]{}<>?/|";
+
+            int lengthgen = int.Parse(LenghtTextBox.Text);
+
+            StringBuilder password = new StringBuilder(lengthgen);
+            byte[] randomBytes = new byte[4];
+
+            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+            {
+                for (int i = 0; i < lengthgen; i++)
+                {
+                    rng.GetBytes(randomBytes);
+                    uint num = BitConverter.ToUInt32(randomBytes, 0);
+                    password.Append(chars[(int)(num % (uint)chars.Length)]);
+                }
+            }
+
+            ContentTextBox.Text = password.ToString();
         }
     }
 }

@@ -33,6 +33,20 @@ namespace pashold.Models
         private string _name;
         private string _content;
 
+        // новое свойство: видимость пароля
+        private bool _isContentVisible = false;
+        [JsonIgnore]
+        public bool IsContentVisible
+        {
+            get => _isContentVisible;
+            set
+            {
+                _isContentVisible = value;
+                OnPropertyChanged(nameof(IsContentVisible));
+                OnPropertyChanged(nameof(Content)); // обновляем отображение
+            }
+        }
+
         [JsonIgnore]
         public string Name
         {
@@ -49,7 +63,7 @@ namespace pashold.Models
                     EncryptedName = CryptoService.Encrypt(value, MainViewModel.EncryptionKey);
 
                 OnPropertyChanged();
-                MainViewModel.SaveCurrentJsonStatic(); // сразу сохраняем файл
+                MainViewModel.SaveCurrentJsonStatic();
             }
         }
 
@@ -58,19 +72,38 @@ namespace pashold.Models
         {
             get
             {
+                // если пароль скрыт — возвращаем маску
+                if (!IsContentVisible)
+                    return "********";
+
+                // расшифровываем только когда нужно
                 if (_content == null && EncryptedContent != null)
                     _content = CryptoService.SafeDecrypt(EncryptedContent, MainViewModel.EncryptionKey);
+
                 return _content;
             }
             set
             {
+                // ВАЖНО: игнорируем установку маски
+                if (value == "********")
+                    return;
+
                 _content = value;
+
                 if (!string.IsNullOrEmpty(MainViewModel.EncryptionKey))
                     EncryptedContent = CryptoService.Encrypt(value, MainViewModel.EncryptionKey);
 
                 OnPropertyChanged();
-                MainViewModel.SaveCurrentJsonStatic(); // сразу сохраняем файл
+                MainViewModel.SaveCurrentJsonStatic();
             }
+        }
+
+        public string GetDecryptedContent()
+        {
+            if (_content == null && EncryptedContent != null)
+                _content = CryptoService.SafeDecrypt(EncryptedContent, MainViewModel.EncryptionKey);
+
+            return _content;
         }
 
         public PasswordItem() { }
@@ -79,6 +112,7 @@ namespace pashold.Models
         {
             Name = name;
             Content = content;
+            _isContentVisible = false;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

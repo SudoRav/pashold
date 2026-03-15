@@ -42,8 +42,15 @@
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <!-- Название пароля -->
                                                     <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Width="100"/>
-                                                    <TextBlock Text="{Binding Content}" Width="300"/>
+
+                                                    <!-- Пароль: скрыт до клика -->
+                                                    <TextBox Text="{Binding Content, UpdateSourceTrigger=PropertyChanged}" Width="300"
+                                                             IsReadOnly="True" 
+                                                             PreviewMouseDoubleClick="PasswordBox_PreviewMouseDoubleClick" 
+                                                             MouseLeave="PasswordBox_MouseLeave"/>
+
                                                     <Button Content="Удалить" Width="80"
                                                             Command="{Binding DataContext.DeletePasswordCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                             CommandParameter="{Binding}" Margin="5,0,0,0"/>

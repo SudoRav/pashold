@@ -269,7 +269,7 @@ namespace pashold.ViewModels
         {
             if (password != null)
             {
-                Clipboard.SetText(password.Content);
+                Clipboard.SetText(password.GetDecryptedContent());
                 MessageBox.Show($"Пароль '{password.Name}' скопирован в буфер обмена!", "Скопировано");
             }
         }

@@ -100,10 +100,10 @@ namespace pashold.Models
 
         public string GetDecryptedContent()
         {
-            if (_content == null && EncryptedContent != null)
-                _content = CryptoService.SafeDecrypt(EncryptedContent, MainViewModel.EncryptionKey);
+            if (EncryptedContent == null)
+                return "";
 
-            return _content;
+            return CryptoService.SafeDecrypt(EncryptedContent, MainViewModel.EncryptionKey);
         }
 
         public PasswordItem() { }

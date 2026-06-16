@@ -27,8 +27,8 @@ namespace pashold
         {
             if (sender is TextBox tb && tb.DataContext is PasswordItem passwordItem)
             {
-                passwordItem.IsContentVisible = false; // раскрываем пароль
-                tb.Focus();
+                passwordItem.IsContentVisible = false; // скрываем пароль
+                //tb.Focus();
                 tb.CaretIndex = tb.Text.Length;
             }
         }

@@ -74,7 +74,7 @@ namespace pashold.Models
             {
                 // если пароль скрыт — возвращаем маску
                 if (!IsContentVisible)
-                    return "********";
+                    return "****************************************";
 
                 // расшифровываем только когда нужно
                 if (_content == null && EncryptedContent != null)
@@ -85,7 +85,7 @@ namespace pashold.Models
             set
             {
                 // ВАЖНО: игнорируем установку маски
-                if (value == "********")
+                if (value == "****************************************")
                     return;
 
                 _content = value;

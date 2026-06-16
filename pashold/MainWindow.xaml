@@ -13,7 +13,7 @@
             <TextBlock Text="JSON файлы:" FontWeight="Bold" Margin="0,0,0,5"/>
             <ListBox ItemsSource="{Binding JsonFiles}" SelectedItem="{Binding SelectedJsonFile}" DisplayMemberPath="OriginalName" Height="300"/>
             <Button Content="Обзор" Command="{Binding BrowseFolderCommand}" Margin="0,5,0,0"/>
-            <Button Content="+ Создать" Command="{Binding CreateProgramFileCommand}" Margin="0,5,0,0"/>
+            <Button Content="+Создать" Command="{Binding CreateProgramFileCommand}" Margin="0,5,0,0"/>
         </StackPanel>
 
         <!-- Правая панель -->
@@ -28,8 +28,8 @@
                             <Border BorderBrush="Gray" BorderThickness="1" Margin="2" Padding="5">
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontSize="14"/>
-                                        <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" FontStyle="Italic"/>
+                                        <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontSize="14" MinWidth="200"/>
+                                        <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" MinWidth="400" FontStyle="Italic"/>
                                         <Button Content="Удалить блок" Width="120"
                                                 Command="{Binding DataContext.DeleteBlockCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}" Margin="5,0,0,0"/>
@@ -43,11 +43,11 @@
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                                     <!-- Название пароля -->
-                                                    <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Width="100"/>
+                                                    <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Width="100" MinWidth="200"/>
 
-                                                    <!-- Пароль: скрыт до клика -->
-                                                    <TextBox Text="{Binding Content, UpdateSourceTrigger=PropertyChanged}" Width="300"
-                                                             IsReadOnly="True" 
+                                                    <!-- Пароль: скрыт до даблклика -->
+                                                    <TextBox Text="{Binding Content, UpdateSourceTrigger=PropertyChanged}" Width="300" MinWidth="600"
+                                                             IsReadOnly="True"
                                                              PreviewMouseDoubleClick="PasswordBox_PreviewMouseDoubleClick" 
                                                              MouseLeave="PasswordBox_MouseLeave"/>
 

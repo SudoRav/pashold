@@ -145,7 +145,6 @@ namespace pashold.ViewModels
                 SaveCurrentJson();
         }
 
-        #region JSON Файлы
         private void BrowseFolder()
         {
             var dlg = new CommonOpenFileDialog();
@@ -212,9 +211,7 @@ namespace pashold.ViewModels
                 EncryptionKey = null;
             }
         }
-        #endregion
 
-        #region Блоки и пароли
         private void AddBlock()
         {
             var block = new Block("", "");
@@ -243,7 +240,8 @@ namespace pashold.ViewModels
 
             if (window.ShowDialog() == true)
             {
-                var password = new PasswordItem(window.Password.Name, window.Password.Content);
+                //var password = new PasswordItem(window.Password.Name, window.Password.Content);
+                var password = window.Password;
                 password.PropertyChanged += Password_PropertyChanged;
 
                 block.PasswordItems.Add(password);
@@ -266,11 +264,10 @@ namespace pashold.ViewModels
         }
 
         private void CopyPassword(PasswordItem password)
-        {
+        {123
             if (password != null)
             {
                 Clipboard.SetText(password.GetDecryptedContent());
-                MessageBox.Show($"Пароль '{password.Name}' скопирован в буфер обмена!", "Скопировано");
             }
         }
 
@@ -316,11 +313,8 @@ namespace pashold.ViewModels
                 MessageBox.Show("Ошибка при автоматическом сохранении JSON файла.", "Ошибка");
             }
         }
-        #endregion
 
-        #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string prop) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
-        #endregion
     }
 }

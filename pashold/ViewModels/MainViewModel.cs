@@ -267,7 +267,6 @@ namespace pashold.ViewModels
         {
             if (password != null)
             {
-                MessageBox.Show("");
                 Clipboard.SetText(password.GetDecryptedContent());
             }
         }

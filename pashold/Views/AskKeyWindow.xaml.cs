@@ -9,6 +9,8 @@ namespace pashold.Views
         public AskKeyWindow()
         {
             InitializeComponent();
+
+            tbKey.Focus();
         }
 
         private void Ok_Click(object sender, RoutedEventArgs e)

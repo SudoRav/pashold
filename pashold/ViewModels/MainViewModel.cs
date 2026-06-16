@@ -265,10 +265,27 @@ namespace pashold.ViewModels
 
         private void CopyPassword(PasswordItem password)
         {
-            if (password != null)
+            if (password == null)
+                return;
+
+            string text = password.GetDecryptedContent();
+            if (string.IsNullOrEmpty(text))
+                return;
+
+            for (int i = 0; i < 5; i++)
             {
-                Clipboard.SetText(password.GetDecryptedContent());
+                try
+                {
+                    Clipboard.SetDataObject(text, true);
+                    return;
+                }
+                catch
+                {
+                    System.Threading.Thread.Sleep(100);
+                }
             }
+
+            MessageBox.Show("Не удалось скопировать пароль в буфер обмена.", "Ошибка");
         }
 
         private void Blocks_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

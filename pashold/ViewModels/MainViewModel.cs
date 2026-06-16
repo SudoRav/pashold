@@ -264,9 +264,10 @@ namespace pashold.ViewModels
         }
 
         private void CopyPassword(PasswordItem password)
-        {123
+        {
             if (password != null)
             {
+                MessageBox.Show("");
                 Clipboard.SetText(password.GetDecryptedContent());
             }
         }

@@ -29,5 +29,14 @@ namespace pashold.Views
         {
             DialogResult = false;
         }
+
+        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                Ok_Click(sender, null);
+                e.Handled = true;
+            }
+        }
     }
 }

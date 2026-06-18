@@ -10,6 +10,8 @@ namespace pashold
         public MainWindow()
         {
             InitializeComponent();
+
+            btn_AddBlock.IsEnabled = false;
         }
 
         private void PasswordBox_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)

@@ -11,6 +11,8 @@ namespace pashold
         public AddProgramFileWindow()
         {
             InitializeComponent();
+
+            tbName.Focus();
         }
 
         private void Create_Click(object sender, RoutedEventArgs e)
@@ -39,6 +41,21 @@ namespace pashold
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
+        }
+
+        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter && tbName.IsFocused)
+            {
+                tbKey.Focus();
+                return;
+            }
+
+            if (e.Key == System.Windows.Input.Key.Enter && tbKey.IsFocused)
+            {
+                Create_Click(sender, e);
+                return;
+            }
         }
     }
 }

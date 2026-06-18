@@ -29,7 +29,7 @@
         <!-- Правая панель -->
         <ScrollViewer>
             <StackPanel Margin="10">
-                <Button Content="Добавить блок" Width="120" Margin="0,0,0,10"
+                <Button x:Name="btn_AddBlock" Content="Добавить блок" Width="120" Margin="0,0,0,10"
                 Command="{Binding AddBlockCommand}" />
 
                 <ItemsControl ItemsSource="{Binding Blocks}">
@@ -48,12 +48,18 @@
                                         <TextBox Grid.Column="0" 
                                          Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" 
                                          FontWeight="Bold" FontSize="14" 
-                                         MinWidth="200" Margin="0,0,5,0"/>
+                                         Width="200" Margin="0,0,5,0"
+                                         MaxHeight="100"
+                                         TextWrapping="Wrap"
+                                         AcceptsReturn="True"/>
 
                                         <TextBox Grid.Column="1" 
                                          Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" 
                                          FontStyle="Italic" 
-                                         MinWidth="400" Margin="0,0,5,0"/>
+                                         Margin="0,0,5,0"
+                                         MaxHeight="100"
+                                         TextWrapping="Wrap"
+                                         AcceptsReturn="True"/>
 
                                         <Button Grid.Column="2" 
                                         Content="Удалить блок" Width="120" Margin="0,0,5,0"

@@ -37,6 +37,9 @@ namespace pashold.Views
                 Ok_Click(sender, null);
                 e.Handled = true;
             }
+
+            if (e.Key == System.Windows.Input.Key.Escape)
+                DialogResult = false;
         }
     }
 }

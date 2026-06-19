@@ -21,6 +21,7 @@ namespace pashold.ViewModels
 
         private readonly Dictionary<string, string> _fileKeys = new Dictionary<string, string>();
         public ObservableCollection<ProgramFile> JsonFiles { get; set; } = new ObservableCollection<ProgramFile>();
+        public bool IsFileSelected => SelectedJsonFile != null;
 
         private ProgramFile _selectedJsonFile;
         public ProgramFile SelectedJsonFile
@@ -60,6 +61,8 @@ namespace pashold.ViewModels
                     {
                         EncryptionKey = keyWindow.Key;
                         _fileKeys[filePath] = EncryptionKey;
+
+                        OnPropertyChanged(nameof(IsFileSelected));
                     }
                     else
                     {

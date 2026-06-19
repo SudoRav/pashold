@@ -56,6 +56,9 @@ namespace pashold
                 Create_Click(sender, e);
                 return;
             }
+
+            if (e.Key == System.Windows.Input.Key.Escape)
+                DialogResult = false;
         }
     }
 }

@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
 namespace pashold
@@ -21,8 +22,16 @@ namespace pashold
         public MainWindow()
         {
             InitializeComponent();
+        }
 
-            btn_ShowPassword.Content = "Скрывать пароль";
+        private void TextBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is TextBox tb && tb.DataContext is PasswordItem passwordItem)
+            {
+                passwordItem.IsContentVisible = true;
+                Clipboard.SetText(passwordItem.Content);
+                passwordItem.IsContentVisible = false;
+            }
         }
 
         private void PasswordBox_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -63,13 +72,13 @@ namespace pashold
 
         private void DeleteBlockButton_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            StartHoldDelete(sender, TimeSpan.FromSeconds(DeleteBlockHoldSeconds), DeleteTarget.Block);
+            StartHoldDelete(sender, TimeSpan.FromSeconds(DeleteBlockHoldSeconds));
             e.Handled = true;
         }
 
         private void DeletePasswordButton_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            StartHoldDelete(sender, TimeSpan.FromSeconds(DeletePasswordHoldSeconds), DeleteTarget.Password);
+            StartHoldDelete(sender, TimeSpan.FromSeconds(DeletePasswordHoldSeconds));
             e.Handled = true;
         }
 
@@ -84,7 +93,7 @@ namespace pashold
             CancelHoldDelete(sender);
         }
 
-        private void StartHoldDelete(object sender, TimeSpan holdDuration, DeleteTarget target)
+        private void StartHoldDelete(object sender, TimeSpan holdDuration)
         {
             if (!(sender is Button button))
                 return;
@@ -97,32 +106,32 @@ namespace pashold
 
             var state = new HoldDeleteState
             {
-                ProgressBar = progressBar,
-                HoldDuration = holdDuration,
-                Target = target
+                ProgressBar = progressBar
             };
 
+            var animation = new DoubleAnimation
+            {
+                From = 0,
+                To = 100,
+                Duration = new Duration(holdDuration),
+                FillBehavior = FillBehavior.HoldEnd
+            };
+
+            animation.Completed += (s, e) => CompleteHoldDelete(button, state);
+
             progressBar.Value = 0;
-            state.Stopwatch.Start();
-            state.Timer.Tick += (s, e) => UpdateHoldDelete(button);
             _holdDeleteStates[button] = state;
             button.CaptureMouse();
-            state.Timer.Start();
+            progressBar.BeginAnimation(ProgressBar.ValueProperty, animation);
         }
 
-        private void UpdateHoldDelete(Button button)
+        private void CompleteHoldDelete(Button button, HoldDeleteState completedState)
         {
-            if (!_holdDeleteStates.TryGetValue(button, out var state))
-                return;
-
-            var progress = state.Stopwatch.Elapsed.TotalMilliseconds / state.HoldDuration.TotalMilliseconds * 100;
-            state.ProgressBar.Value = Math.Min(100, progress);
-
-            if (progress < 100)
+            if (!_holdDeleteStates.TryGetValue(button, out var currentState) || !ReferenceEquals(currentState, completedState))
                 return;
 
             StopHoldDelete(button, resetProgress: false);
-            ExecuteDelete(button, state.Target);
+            ExecuteDelete(button);
         }
 
         private void CancelHoldDelete(object sender)
@@ -136,18 +145,16 @@ namespace pashold
             if (!_holdDeleteStates.TryGetValue(button, out var state))
                 return;
 
-            state.Timer.Stop();
-            state.Stopwatch.Stop();
             _holdDeleteStates.Remove(button);
+            state.ProgressBar.BeginAnimation(ProgressBar.ValueProperty, null);
 
             if (button.IsMouseCaptured)
                 button.ReleaseMouseCapture();
 
-            if (resetProgress)
-                state.ProgressBar.Value = 0;
+            state.ProgressBar.Value = resetProgress ? 0 : 100;
         }
 
-        private void ExecuteDelete(Button button, DeleteTarget target)
+        private void ExecuteDelete(Button button)
         {
             var command = button.Command;
             var commandParameter = button.CommandParameter;
@@ -190,19 +197,9 @@ namespace pashold
             return null;
         }
 
-        private enum DeleteTarget
-        {
-            Block,
-            Password
-        }
-
         private class HoldDeleteState
         {
             public ProgressBar ProgressBar { get; set; }
-            public TimeSpan HoldDuration { get; set; }
-            public DeleteTarget Target { get; set; }
-            public Stopwatch Stopwatch { get; } = new Stopwatch();
-            public DispatcherTimer Timer { get; } = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
         }
     }
 }

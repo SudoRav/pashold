@@ -114,7 +114,7 @@
                                                 Command="{Binding DataContext.AddPasswordCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}">
                                             <TextBlock TextAlignment="Center">
-                                                <Run Text="➕" FontSize="12"/>
+                                                <Run Text="➕" FontSize="14"/>
                                                 <Run Text="" FontSize="12"/>
                                             </TextBlock>
                                         </Button>
@@ -123,11 +123,12 @@
                                                 Width="120" Margin="0,0,200,0"
                                                 Command="{Binding DataContext.DeleteBlockCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
+                                                FontWeight="Bold"
                                                 PreviewMouseLeftButtonDown="DeleteBlockButton_PreviewMouseLeftButtonDown"
                                                 PreviewMouseLeftButtonUp="DeleteButton_PreviewMouseLeftButtonUp"
                                                 MouseLeave="DeleteButton_MouseLeave">
                                             <TextBlock TextAlignment="Center">
-                                                <Run Text="―" FontSize="12"/>
+                                                <Run Text="―" FontSize="14"/>
                                                 <Run Text="" FontSize="12"/>
                                             </TextBlock>
                                         </Button>
@@ -170,7 +171,7 @@ IsHitTestVisible="False"/>
                                                              MouseLeave="PasswordBox_MouseLeave"/>
 
                                                     <Button Grid.Column="2" 
-        Width="60" Margin="0,0,5,0"
+        Width="45" Margin="0,0,5,0"
         Command="{Binding DataContext.MovePasswordUp, RelativeSource={RelativeSource AncestorType=Window}}"
         CommandParameter="{Binding}">
                                                         <TextBlock TextAlignment="Center">
@@ -180,7 +181,7 @@ IsHitTestVisible="False"/>
                                                     </Button>
 
                                                     <Button Grid.Column="3" 
-Width="60" Margin="0,0,5,0"
+Width="45" Margin="0,0,5,0"
 Command="{Binding DataContext.MovePasswordDown, RelativeSource={RelativeSource AncestorType=Window}}"
 CommandParameter="{Binding}">
                                                         <TextBlock TextAlignment="Center">
@@ -190,7 +191,7 @@ CommandParameter="{Binding}">
                                                     </Button>
 
                                                     <Button Grid.Column="4" 
-                                                            Content="⧉" Width="60" Margin="0,0,5,0" FontSize="16"
+                                                            Content="⧉" Width="90" Margin="0,0,5,0" FontSize="16"
                                                             Command="{Binding DataContext.CopyPasswordCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                             CommandParameter="{Binding}"/>
 
@@ -198,6 +199,7 @@ CommandParameter="{Binding}">
                                                             Content="―" Width="120" Margin="0,0,5,0" FontSize="16"
                                                             Command="{Binding DataContext.DeletePasswordCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                             CommandParameter="{Binding}"
+                                                            FontWeight="Bold"
                                                             PreviewMouseLeftButtonDown="DeletePasswordButton_PreviewMouseLeftButtonDown"
                                                             PreviewMouseLeftButtonUp="DeleteButton_PreviewMouseLeftButtonUp"
                                                             MouseLeave="DeleteButton_MouseLeave">

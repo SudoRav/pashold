@@ -103,6 +103,8 @@ namespace pashold.ViewModels
         public ICommand AddPasswordCommand { get; }
         public ICommand DeletePasswordCommand { get; }
         public ICommand CopyPasswordCommand { get; }
+        public ICommand MovePasswordUp { get; }
+        public ICommand MovePasswordDown { get; }
 
         // Конструктор
         public MainViewModel()
@@ -116,6 +118,8 @@ namespace pashold.ViewModels
             AddPasswordCommand = new RelayCommand<Block>(AddPassword);
             DeletePasswordCommand = new RelayCommand<PasswordItem>(DeletePassword);
             CopyPasswordCommand = new RelayCommand<PasswordItem>(CopyPassword);
+            MovePasswordUp = new RelayCommand<PasswordItem>(MovePasswordItemUp);
+            MovePasswordDown = new RelayCommand<PasswordItem>(MovePasswordItemDown);
 
             // Автозагрузка последнего пути
             if (!string.IsNullOrEmpty(Properties.Settings.Default.LastJsonFolder) && Directory.Exists(Properties.Settings.Default.LastJsonFolder))
@@ -263,6 +267,36 @@ namespace pashold.ViewModels
                     SaveCurrentJson();
                     break;
                 }
+            }
+        }
+
+        private void MovePasswordItemUp(PasswordItem password)
+        {
+            MovePasswordItem(password, -1);
+        }
+
+        private void MovePasswordItemDown(PasswordItem password)
+        {
+            MovePasswordItem(password, 1);
+        }
+
+        private void MovePasswordItem(PasswordItem password, int direction)
+        {
+            if (password == null) return;
+
+            foreach (var block in Blocks)
+            {
+                int currentIndex = block.PasswordItems.IndexOf(password);
+                if (currentIndex < 0)
+                    continue;
+
+                int newIndex = currentIndex + direction;
+                if (newIndex < 0 || newIndex >= block.PasswordItems.Count)
+                    return;
+
+                block.PasswordItems.Move(currentIndex, newIndex);
+                SaveCurrentJson();
+                return;
             }
         }
 

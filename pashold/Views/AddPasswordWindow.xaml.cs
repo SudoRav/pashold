@@ -16,6 +16,9 @@ namespace pashold
 
             NameTextBox.Text = $"Новый пароль {DateTime.Now.ToString("dd.MM.yyyy")}";
             ContentTextBox.Text = GenPas();
+
+            NameTextBox.Focus();
+            NameTextBox.SelectAll();
         }
 
         private void Add_Click(object sender, RoutedEventArgs e)
@@ -65,6 +68,17 @@ namespace pashold
             }
 
             return password.ToString();
+        }
+
+        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                Add_Click(sender, e);
+            }
+
+            if (e.Key == System.Windows.Input.Key.Escape)
+                DialogResult = false;
         }
     }
 }

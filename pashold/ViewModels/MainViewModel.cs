@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
@@ -102,6 +103,7 @@ namespace pashold.ViewModels
         public ICommand DeleteBlockCommand { get; }
         public ICommand AddPasswordCommand { get; }
         public ICommand DeletePasswordCommand { get; }
+        public ICommand MultiCopyPasswordCommand { get; }
         public ICommand CopyPasswordCommand { get; }
         public ICommand MovePasswordUp { get; }
         public ICommand MovePasswordDown { get; }
@@ -117,6 +119,7 @@ namespace pashold.ViewModels
             DeleteBlockCommand = new RelayCommand<Block>(DeleteBlock);
             AddPasswordCommand = new RelayCommand<Block>(AddPassword);
             DeletePasswordCommand = new RelayCommand<PasswordItem>(DeletePassword);
+            MultiCopyPasswordCommand = new RelayCommand<Block>(MultiCopyPassword);
             CopyPasswordCommand = new RelayCommand<PasswordItem>(CopyPassword);
             MovePasswordUp = new RelayCommand<PasswordItem>(MovePasswordItemUp);
             MovePasswordDown = new RelayCommand<PasswordItem>(MovePasswordItemDown);
@@ -297,6 +300,36 @@ namespace pashold.ViewModels
                 block.PasswordItems.Move(currentIndex, newIndex);
                 SaveCurrentJson();
                 return;
+            }
+        }
+
+        private void MultiCopyPassword(Block block)
+        {
+            if (block == null)
+                return;
+
+            var passwords = block.PasswordItems?.ToList() ?? new List<PasswordItem>();
+
+            foreach (PasswordItem password in passwords)
+            {
+                string text = password.GetDecryptedContent();
+                if (string.IsNullOrEmpty(text))
+                    return;
+
+                for (int i = 0; i < 5; i++)
+                {
+                    try
+                    {
+                        Clipboard.SetDataObject(text, true);
+                        return;
+                    }
+                    catch
+                    {
+                        System.Threading.Thread.Sleep(100);
+                    }
+                }
+
+                MessageBox.Show("Не удалось скопировать пароль в буфер обмена.", "Ошибка");
             }
         }
 

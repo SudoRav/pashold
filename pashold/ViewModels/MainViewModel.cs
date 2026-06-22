@@ -137,7 +137,7 @@ namespace pashold.ViewModels
         public static void SaveCurrentJsonStatic() => _instance?.SaveCurrentJson();
 
         private void Block_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
+        {   
             if (e.PropertyName == "Name" || e.PropertyName == "Description")
                 SaveCurrentJson();
         }

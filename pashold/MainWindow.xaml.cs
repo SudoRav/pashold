@@ -28,26 +28,87 @@ namespace pashold
         {
             if (sender is TextBox tb && tb.DataContext is PasswordItem passwordItem)
             {
-                passwordItem.IsContentVisible = true;
-                Clipboard.SetText(passwordItem.Content);
-                passwordItem.IsContentVisible = false;
+                try
+                {
+                    passwordItem.IsContentVisible = true;
+                    Clipboard.SetText(passwordItem.Content);
+                    if (!isshowpas)
+                        passwordItem.IsContentVisible = false;
+                    ShowCopyReaction(tb);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
             }
         }
 
         private void PasswordBox_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (sender is TextBox tb && tb.DataContext is PasswordItem passwordItem)
+            //if (sender is TextBox tb && tb.DataContext is PasswordItem passwordItem)
+            //{
+            //    passwordItem.IsContentVisible = true;
+            //    Clipboard.SetText(passwordItem.Content);
+
+            //    if (!isshowpas)
+            //        passwordItem.IsContentVisible = false;
+
+            //    tb.Focus();
+            //    tb.CaretIndex = tb.Text.Length;
+            //    tb.SelectAll();
+            //}
+        }
+
+        private void ShowCopyReaction(DependencyObject source)
+        {
+            var reactionBorder = FindNamedVisualChild<Border>(FindParent<Grid>(source), "brd_reaction");
+            if (reactionBorder == null)
+                return;
+
+            reactionBorder.BeginAnimation(UIElement.OpacityProperty, null);
+            reactionBorder.Opacity = 1;
+
+            var animation = new DoubleAnimation
             {
-                passwordItem.IsContentVisible = true;
-                Clipboard.SetText(passwordItem.Content);
+                From = 1,
+                To = 0,
+                Duration = TimeSpan.FromSeconds(0.3),
+                FillBehavior = FillBehavior.Stop
+            };
 
-                if (!isshowpas)
-                    passwordItem.IsContentVisible = false;
+            animation.Completed += (s, e) => reactionBorder.Opacity = 0;
+            reactionBorder.BeginAnimation(UIElement.OpacityProperty, animation);
+        }
 
-                tb.Focus();
-                tb.CaretIndex = tb.Text.Length;
-                tb.SelectAll();
+        private static T FindParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            while (child != null)
+            {
+                child = VisualTreeHelper.GetParent(child);
+                if (child is T result)
+                    return result;
             }
+
+            return null;
+        }
+
+        private static T FindNamedVisualChild<T>(DependencyObject parent, string name) where T : FrameworkElement
+        {
+            if (parent == null)
+                return null;
+
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T result && result.Name == name)
+                    return result;
+
+                var descendant = FindNamedVisualChild<T>(child, name);
+                if (descendant != null)
+                    return descendant;
+            }
+
+            return null;
         }
 
         private void PasswordBox_MouseLeave(object sender, MouseEventArgs e)
@@ -56,7 +117,7 @@ namespace pashold
             {
                 passwordItem.IsContentVisible = false; // скрываем пароль
                 //tb.Focus();
-                tb.CaretIndex = tb.Text.Length;
+                //tb.CaretIndex = tb.Text.Length;
             }
         }
 

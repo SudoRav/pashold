@@ -80,5 +80,21 @@ namespace pashold
             if (e.Key == System.Windows.Input.Key.Escape)
                 DialogResult = false;
         }
+
+        private void Click_10(object sender, RoutedEventArgs e)
+        {
+            LenghtTextBox.Text = "10";
+            ContentTextBox.Text = GenPas();
+        }
+        private void Click_20(object sender, RoutedEventArgs e)
+        {
+            LenghtTextBox.Text = "20";
+            ContentTextBox.Text = GenPas();
+        }
+        private void Click_40(object sender, RoutedEventArgs e)
+        {
+            LenghtTextBox.Text = "40";
+            ContentTextBox.Text = GenPas();
+        }
     }
 }

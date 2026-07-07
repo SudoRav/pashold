@@ -308,28 +308,21 @@ namespace pashold.ViewModels
             if (block == null)
                 return;
 
-            var passwords = block.PasswordItems?.ToList() ?? new List<PasswordItem>();
+            var passwords = block.PasswordItems?
+                .Reverse()
+                .Select(password => password.GetDecryptedContent())
+                .Where(text => !string.IsNullOrEmpty(text))
+                .ToList() ?? new List<string>();
 
-            foreach (PasswordItem password in passwords)
+            foreach (string text in passwords)
             {
-                string text = password.GetDecryptedContent();
-                if (string.IsNullOrEmpty(text))
-                    return;
-
-                for (int i = 0; i < 5; i++)
+                if (!TryCopyTextToClipboard(text))
                 {
-                    try
-                    {
-                        Clipboard.SetDataObject(text, true);
-                        return;
-                    }
-                    catch
-                    {
-                        System.Threading.Thread.Sleep(100);
-                    }
+                    MessageBox.Show("Не удалось скопировать все пароли в буфер обмена.", "Ошибка");
+                    return;
                 }
 
-                MessageBox.Show("Не удалось скопировать пароль в буфер обмена.", "Ошибка");
+                System.Threading.Thread.Sleep(230);
             }
         }
 
@@ -342,12 +335,18 @@ namespace pashold.ViewModels
             if (string.IsNullOrEmpty(text))
                 return;
 
+            if (!TryCopyTextToClipboard(text))
+                MessageBox.Show("Не удалось скопировать пароль в буфер обмена.", "Ошибка");
+        }
+
+        private bool TryCopyTextToClipboard(string text)
+        {
             for (int i = 0; i < 5; i++)
             {
                 try
                 {
                     Clipboard.SetDataObject(text, true);
-                    return;
+                    return true;
                 }
                 catch
                 {
@@ -355,7 +354,7 @@ namespace pashold.ViewModels
                 }
             }
 
-            MessageBox.Show("Не удалось скопировать пароль в буфер обмена.", "Ошибка");
+            return false;
         }
 
         private void Blocks_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

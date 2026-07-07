@@ -262,5 +262,10 @@ namespace pashold
         {
             public ProgressBar ProgressBar { get; set; }
         }
+
+        private void btn_AddBlock_Click(object sender, RoutedEventArgs e)
+        {
+            scroll.ScrollToBottom();
+        }
     }
 }

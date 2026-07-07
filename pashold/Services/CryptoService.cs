@@ -40,12 +40,28 @@ namespace pashold.Services
 
         public static string Decrypt(string encryptedText, string password)
         {
+            TryDecrypt(encryptedText, password, out string decryptedText);
+            return decryptedText;
+        }
+
+        public static bool TryDecrypt(string encryptedText, string password, out string decryptedText)
+        {
+            decryptedText = null;
+
             if (string.IsNullOrEmpty(encryptedText))
-                return "";
+            {
+                decryptedText = "";
+                return true;
+            }
+
+            if (string.IsNullOrEmpty(password))
+                return false;
 
             try
             {
                 byte[] data = Convert.FromBase64String(encryptedText);
+                if (data.Length < 17)
+                    return false;
 
                 using var aes = Aes.Create();
                 aes.Key = GetKey(password);
@@ -61,34 +77,29 @@ namespace pashold.Services
                 using var decryptor = aes.CreateDecryptor();
 
                 byte[] decrypted = decryptor.TransformFinalBlock(cipher, 0, cipher.Length);
+                decryptedText = Encoding.UTF8.GetString(decrypted);
 
-                return Encoding.UTF8.GetString(decrypted);
+                return true;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+            catch (ArgumentException)
+            {
+                return false;
             }
             catch (CryptographicException)
             {
-                // Выбрасываем сообщение о неправильном ключе
-                System.Windows.MessageBox.Show(
-                    "Неверный ключ шифрования! Дешифровка невозможна.",
-                    "Ошибка",
-                    System.Windows.MessageBoxButton.OK,
-                    System.Windows.MessageBoxImage.Error
-                );
-                return null; // или ""
+                return false;
             }
         }
+
         public static string SafeDecrypt(string encryptedText, string password)
         {
-            if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(encryptedText))
-                return null;
-
-            try
-            {
-                return Decrypt(encryptedText, password);
-            }
-            catch
-            {
-                return null;
-            }
+            return TryDecrypt(encryptedText, password, out string decryptedText)
+                ? decryptedText
+                : null;
         }
     }
 }

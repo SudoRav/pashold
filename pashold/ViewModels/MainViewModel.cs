@@ -57,7 +57,11 @@ namespace pashold.ViewModels
                 }
                 else
                 {
-                    var keyWindow = new AskKeyWindow { Owner = Application.Current.MainWindow };
+                    var keyWindow = new AskKeyWindow
+                    {
+                        Owner = Application.Current.MainWindow,
+                        KeyValidator = enteredKey => IsValidKey(_selectedJsonFile, enteredKey)
+                    };
                     if (keyWindow.ShowDialog() == true)
                     {
                         EncryptionKey = keyWindow.Key;
@@ -142,6 +146,34 @@ namespace pashold.ViewModels
         }
 
         public static void SaveCurrentJsonStatic() => _instance?.SaveCurrentJson();
+
+        private bool IsValidKey(ProgramFile programFile, string key)
+        {
+            if (programFile?.Blocks == null)
+                return true;
+
+            foreach (var block in programFile.Blocks)
+            {
+                if (!CanDecrypt(block.EncryptedName, key) || !CanDecrypt(block.EncryptedDescription, key))
+                    return false;
+
+                if (block.PasswordItems == null)
+                    continue;
+
+                foreach (var password in block.PasswordItems)
+                {
+                    if (!CanDecrypt(password.EncryptedName, key) || !CanDecrypt(password.EncryptedContent, key))
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool CanDecrypt(string encryptedText, string key)
+        {
+            return string.IsNullOrEmpty(encryptedText) || CryptoService.TryDecrypt(encryptedText, key, out _);
+        }
 
         private void Block_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {   

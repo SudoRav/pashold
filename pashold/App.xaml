@@ -152,7 +152,21 @@
 
         <Style TargetType="ProgressBar">
             <Setter Property="Foreground" Value="{StaticResource DiscordGreenBrush}"/>
-            <Setter Property="Background" Value="{StaticResource DiscordDarkestBrush}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ProgressBar">
+                        <Grid ClipToBounds="True" Background="{TemplateBinding Background}">
+                            <Rectangle x:Name="PART_Track" Fill="{TemplateBinding Background}"/>
+                            <Decorator x:Name="PART_Indicator" HorizontalAlignment="Left">
+                                <Rectangle Fill="{TemplateBinding Foreground}"/>
+                            </Decorator>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Application.Resources>
 </Application>

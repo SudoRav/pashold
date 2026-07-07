@@ -1,10 +1,13 @@
-﻿using System.Windows;
+﻿using System;
+using System.Media;
+using System.Windows;
 
 namespace pashold.Views
 {
     public partial class AskKeyWindow : Window
     {
         public string Key { get; private set; }
+        public Func<string, bool> KeyValidator { get; set; }
 
         public AskKeyWindow()
         {
@@ -21,7 +24,16 @@ namespace pashold.Views
                 return;
             }
 
-            Key = tbKey.Password;
+            string enteredKey = tbKey.Password;
+            if (KeyValidator != null && !KeyValidator(enteredKey))
+            {
+                tbKey.Clear();
+                tbKey.Focus();
+                SystemSounds.Hand.Play();
+                return;
+            }
+
+            Key = enteredKey;
             DialogResult = true;
         }
 

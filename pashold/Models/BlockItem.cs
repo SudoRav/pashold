@@ -35,7 +35,7 @@ namespace pashold.Models
 
         private string _name;
         private string _description;
-        private bool _isExpanded = true;
+        private bool _isExpanded = false;
 
         [JsonIgnore]
         public string Name

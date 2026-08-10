@@ -24,6 +24,8 @@ namespace pashold
             InitializeComponent();
         }
 
+        //˃скрыто ˅открыто
+
         private void TextBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             if (sender is TextBox tb && tb.DataContext is PasswordItem passwordItem)
@@ -126,9 +128,9 @@ namespace pashold
             isshowpas = !isshowpas;
 
             if (isshowpas)
-                btn_ShowPassword.Content = "☐ Показывать пароль";
+                btn_ShowPassword.Content = "☐ Показывать содержимое";
             else
-                btn_ShowPassword.Content = "■ Скрывать пароль";
+                btn_ShowPassword.Content = "■ Скрывать содержимое";
         }
 
         private void DeleteBlockButton_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

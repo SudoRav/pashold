@@ -14,7 +14,7 @@ namespace pashold
         {
             InitializeComponent();
 
-            NameTextBox.Text = $"Новый пароль {DateTime.Now.ToString("dd.MM.yyyy")}";
+            NameTextBox.Text = $"{DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss")}";
             ContentTextBox.Text = GenPas();
 
             NameTextBox.Focus();
@@ -50,24 +50,31 @@ namespace pashold
 
         private string GenPas()
         {
-            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()-_=+[]{}<>?/|";
-
-            int lengthgen = int.Parse(LenghtTextBox.Text);
-
-            StringBuilder password = new StringBuilder(lengthgen);
-            byte[] randomBytes = new byte[4];
-
-            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+            try
             {
-                for (int i = 0; i < lengthgen; i++)
-                {
-                    rng.GetBytes(randomBytes);
-                    uint num = BitConverter.ToUInt32(randomBytes, 0);
-                    password.Append(chars[(int)(num % (uint)chars.Length)]);
-                }
-            }
+                const string chars = "11223344556677889900abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()-_=+[]{}<>?/|";
 
-            return password.ToString();
+                int lengthgen = int.Parse(LenghtTextBox.Text);
+
+                StringBuilder password = new StringBuilder(lengthgen);
+                byte[] randomBytes = new byte[4];
+
+                using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+                {
+                    for (int i = 0; i < lengthgen; i++)
+                    {
+                        rng.GetBytes(randomBytes);
+                        uint num = BitConverter.ToUInt32(randomBytes, 0);
+                        password.Append(chars[(int)(num % (uint)chars.Length)]);
+                    }
+                }
+
+                return password.ToString();
+            }
+            catch
+            {
+                return "";
+            }
         }
 
         private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)

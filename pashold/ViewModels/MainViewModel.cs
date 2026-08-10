@@ -111,6 +111,9 @@ namespace pashold.ViewModels
         public ICommand CopyPasswordCommand { get; }
         public ICommand MovePasswordUp { get; }
         public ICommand MovePasswordDown { get; }
+        public ICommand MoveBlockUp { get; }
+        public ICommand MoveBlockDown { get; }
+        public ICommand ToggleBlockExpansionCommand { get; }
 
         // Конструктор
         public MainViewModel()
@@ -127,6 +130,9 @@ namespace pashold.ViewModels
             CopyPasswordCommand = new RelayCommand<PasswordItem>(CopyPassword);
             MovePasswordUp = new RelayCommand<PasswordItem>(MovePasswordItemUp);
             MovePasswordDown = new RelayCommand<PasswordItem>(MovePasswordItemDown);
+            MoveBlockUp = new RelayCommand<Block>(MoveBlockItemUp);
+            MoveBlockDown = new RelayCommand<Block>(MoveBlockItemDown);
+            ToggleBlockExpansionCommand = new RelayCommand<Block>(ToggleBlockExpansion);
 
             // Автозагрузка последнего пути
             if (!string.IsNullOrEmpty(Properties.Settings.Default.LastJsonFolder) && Directory.Exists(Properties.Settings.Default.LastJsonFolder))
@@ -303,6 +309,37 @@ namespace pashold.ViewModels
                     break;
                 }
             }
+        }
+
+        private void MoveBlockItemUp(Block block)
+        {
+            MoveBlockItem(block, -1);
+        }
+
+        private void MoveBlockItemDown(Block block)
+        {
+            MoveBlockItem(block, 1);
+        }
+
+        private void MoveBlockItem(Block block, int direction)
+        {
+            if (block == null) return;
+
+            int currentIndex = Blocks.IndexOf(block);
+            if (currentIndex < 0)
+                return;
+
+            int newIndex = currentIndex + direction;
+            if (newIndex < 0 || newIndex >= Blocks.Count)
+                return;
+
+            Blocks.Move(currentIndex, newIndex);
+            SaveCurrentJson();
+        }
+
+        private void ToggleBlockExpansion(Block block)
+        {
+            block?.ToggleExpansion();
         }
 
         private void MovePasswordItemUp(PasswordItem password)

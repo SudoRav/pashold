@@ -35,6 +35,7 @@ namespace pashold.Models
 
         private string _name;
         private string _description;
+        private bool _isExpanded = true;
 
         [JsonIgnore]
         public string Name
@@ -76,6 +77,29 @@ namespace pashold.Models
                 OnPropertyChanged();
                 MainViewModel.SaveCurrentJsonStatic(); // сразу сохраняем файл
             }
+        }
+
+        [JsonIgnore]
+        public bool IsExpanded
+        {
+            get => _isExpanded;
+            set
+            {
+                if (_isExpanded == value)
+                    return;
+
+                _isExpanded = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ExpansionButtonText));
+            }
+        }
+
+        [JsonIgnore]
+        public string ExpansionButtonText => IsExpanded ? "˅" : "˃";
+
+        public void ToggleExpansion()
+        {
+            IsExpanded = !IsExpanded;
         }
 
         public Block(string name, string description)

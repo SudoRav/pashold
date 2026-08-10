@@ -24,7 +24,6 @@ namespace pashold
             InitializeComponent();
         }
 
-        //˃скрыто ˅открыто
 
         private void TextBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {

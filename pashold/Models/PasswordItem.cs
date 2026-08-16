@@ -19,7 +19,7 @@ namespace pashold.Models
             }
         }
 
-        private string _encryptedContent;
+        private string _encryptedContent; 
         public string EncryptedContent
         {
             get => _encryptedContent;

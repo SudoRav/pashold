@@ -115,6 +115,8 @@ namespace pashold.ViewModels
         public ICommand MoveBlockDown { get; }
         public ICommand ToggleBlockExpansionCommand { get; }
 
+        public ICommand ShowPasswordQRCodeCommand { get; }
+
         // Конструктор
         public MainViewModel()
         {
@@ -133,6 +135,7 @@ namespace pashold.ViewModels
             MoveBlockUp = new RelayCommand<Block>(MoveBlockItemUp);
             MoveBlockDown = new RelayCommand<Block>(MoveBlockItemDown);
             ToggleBlockExpansionCommand = new RelayCommand<Block>(ToggleBlockExpansion);
+            ShowPasswordQRCodeCommand = new RelayCommand<Block>(ShowPasswordQRCode);
 
             // Автозагрузка последнего пути
             if (!string.IsNullOrEmpty(Properties.Settings.Default.LastJsonFolder) && Directory.Exists(Properties.Settings.Default.LastJsonFolder))
@@ -342,6 +345,11 @@ namespace pashold.ViewModels
             block?.ToggleExpansion();
         }
 
+        private void ShowPasswordQRCode(Block block)
+        {
+
+        }
+
         private void MovePasswordItemUp(PasswordItem password)
         {
             MovePasswordItem(password, -1);
@@ -382,6 +390,9 @@ namespace pashold.ViewModels
                 .Select(password => password.GetDecryptedContent())
                 .Where(text => !string.IsNullOrEmpty(text))
                 .ToList() ?? new List<string>();
+
+            TryCopyTextToClipboard("--------------------");
+            System.Threading.Thread.Sleep(230);
 
             foreach (string text in passwords)
             {

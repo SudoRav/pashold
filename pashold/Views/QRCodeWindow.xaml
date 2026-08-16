@@ -1,0 +1,18 @@
+﻿<Window x:Class="pashold.Views.QRCodeWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="QR-код" Height="420" Width="380"
+        WindowStartupLocation="CenterOwner"
+        KeyDown="Window_KeyDown"
+        Deactivated="Window_Deactivated"
+        Loaded="Window_Loaded"
+        Background="{StaticResource DiscordDarkBrush}">
+    <Border Margin="16" Padding="18" Background="{StaticResource DiscordDarkerBrush}" CornerRadius="12">
+        <StackPanel>
+            <Border Background="White" Padding="10" HorizontalAlignment="Center" Margin="0,0,0,16">
+                <Image x:Name="imgQrCode" Width="280" Height="280" Stretch="Uniform"/>
+            </Border>
+            <Button Content="Закрыть" Width="110" HorizontalAlignment="Right" Click="Close_Click"/>
+        </StackPanel>
+    </Border>
+</Window>

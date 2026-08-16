@@ -12,7 +12,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
-
 namespace pashold.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
@@ -117,8 +116,6 @@ namespace pashold.ViewModels
         public ICommand MoveBlockDown { get; }
         public ICommand ToggleBlockExpansionCommand { get; }
 
-        public ICommand ShowPasswordQRCodeCommand { get; }
-
         // Конструктор
         public MainViewModel()
         {
@@ -138,7 +135,6 @@ namespace pashold.ViewModels
             MoveBlockUp = new RelayCommand<Block>(MoveBlockItemUp);
             MoveBlockDown = new RelayCommand<Block>(MoveBlockItemDown);
             ToggleBlockExpansionCommand = new RelayCommand<Block>(ToggleBlockExpansion);
-            ShowPasswordQRCodeCommand = new RelayCommand<Block>(ShowPasswordQRCode);
 
             // Автозагрузка последнего пути
             if (!string.IsNullOrEmpty(Properties.Settings.Default.LastJsonFolder) && Directory.Exists(Properties.Settings.Default.LastJsonFolder))
@@ -348,11 +344,6 @@ namespace pashold.ViewModels
             block?.ToggleExpansion();
         }
 
-        private void ShowPasswordQRCode(Block block)
-        {
-
-        }
-
         private void MovePasswordItemUp(PasswordItem password)
         {
             MovePasswordItem(password, -1);
@@ -425,12 +416,12 @@ namespace pashold.ViewModels
 
         private void ShowPasswordQRCode(PasswordItem password)
         {
-            if (password == null || string.IsNullOrEmpty(password.EncryptedContent))
+            if (password == null || string.IsNullOrEmpty(password.Content))
                 return;
 
             try
             {
-                var window = new QRCodeWindow(password.EncryptedContent)
+                var window = new QRCodeWindow(password.Content)
                 {
                     Owner = Application.Current.MainWindow
                 };

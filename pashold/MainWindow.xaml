@@ -240,15 +240,6 @@ IsHitTestVisible="False"/>
                                                              PreviewMouseDoubleClick="PasswordBox_PreviewMouseDoubleClick"
                                                              MouseLeave="PasswordBox_MouseLeave"/>
 
-                                                    <Button Grid.Column="2"
-Width="45" Margin="0,0,5,0"
-Command="{Binding DataContext.ShowPasswordQRCodeCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-CommandParameter="{Binding}">
-                                                        <TextBlock TextAlignment="Center">
-<Run Text="QR" FontSize="14"/>
-                                                        </TextBlock>
-                                                    </Button>
-
                                                     <Button Grid.Column="3"
         Width="45" Margin="0,0,5,0"
         Command="{Binding DataContext.MovePasswordUp, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -267,7 +258,7 @@ CommandParameter="{Binding}">
                                                         </TextBlock>
                                                     </Button>
 
-                                                    <Button Grid.Column="4"
+                                                    <Button Grid.Column="2"
                                                             Content="QR" Width="55" Margin="0,0,5,0" FontSize="12"
                                                             Command="{Binding DataContext.ShowPasswordQRCodeCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                             CommandParameter="{Binding}"/>

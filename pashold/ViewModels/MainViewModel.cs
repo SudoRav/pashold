@@ -2,6 +2,7 @@
 using pashold.Models;
 using pashold.Services;
 using pashold.Views;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -109,6 +110,7 @@ namespace pashold.ViewModels
         public ICommand DeletePasswordCommand { get; }
         public ICommand MultiCopyPasswordCommand { get; }
         public ICommand CopyPasswordCommand { get; }
+        public ICommand ShowPasswordQRCodeCommand { get; }
         public ICommand MovePasswordUp { get; }
         public ICommand MovePasswordDown { get; }
         public ICommand MoveBlockUp { get; }
@@ -128,6 +130,7 @@ namespace pashold.ViewModels
             DeletePasswordCommand = new RelayCommand<PasswordItem>(DeletePassword);
             MultiCopyPasswordCommand = new RelayCommand<Block>(MultiCopyPassword);
             CopyPasswordCommand = new RelayCommand<PasswordItem>(CopyPassword);
+            ShowPasswordQRCodeCommand = new RelayCommand<PasswordItem>(ShowPasswordQRCode);
             MovePasswordUp = new RelayCommand<PasswordItem>(MovePasswordItemUp);
             MovePasswordDown = new RelayCommand<PasswordItem>(MovePasswordItemDown);
             MoveBlockUp = new RelayCommand<Block>(MoveBlockItemUp);
@@ -406,6 +409,26 @@ namespace pashold.ViewModels
 
             if (!TryCopyTextToClipboard(text))
                 MessageBox.Show("Не удалось скопировать пароль в буфер обмена.", "Ошибка");
+        }
+
+
+        private void ShowPasswordQRCode(PasswordItem password)
+        {
+            if (password == null || string.IsNullOrEmpty(password.EncryptedContent))
+                return;
+
+            try
+            {
+                var window = new QRCodeWindow(password.EncryptedContent)
+                {
+                    Owner = Application.Current.MainWindow
+                };
+                window.ShowDialog();
+            }
+            catch (ArgumentException ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка");
+            }
         }
 
         private bool TryCopyTextToClipboard(string text)

@@ -108,6 +108,7 @@
     <Compile Include="Models\BlockItem.cs" />
     <Compile Include="Models\ProgramFile.cs" />
     <Compile Include="Services\CryptoService.cs" />
+    <Compile Include="Services\QrCodeService.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\RelayCommand.cs" />
     <Compile Include="Views\AddPasswordWindow.xaml.cs">
@@ -118,6 +119,9 @@
     </Compile>
     <Compile Include="Views\AskKeyWindow.xaml.cs">
       <DependentUpon>AskKeyWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\QRCodeWindow.xaml.cs">
+      <DependentUpon>QRCodeWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -139,6 +143,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\AskKeyWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\QRCodeWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
